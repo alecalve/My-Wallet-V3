@@ -625,3 +625,54 @@ describe "Blockchain-Wallet", ->
         rwall = JSON.parse(json1, Wallet.reviver)
         json2     = JSON.stringify(rwall, null, 2)
         expect(json1).toEqual(json2)
+
+    describe "_getPrivateKey", ->
+
+      it "should not not accept an invalid index", ->
+        try
+          wallet._getPrivateKey(-1, 'M/1/1')
+        catch e
+          expect(e.toString()).toEqual('AssertionError: Error: account non-existent')
+        try
+          wallet._getPrivateKey(1.2432, 'M/1/1')
+        catch e
+          expect(e.toString()).toEqual('AssertionError: Error: account non-existent')
+
+        try
+          wallet._getPrivateKey(null, 'M/1/1')
+        catch e
+          expect(e.toString()).toEqual('AssertionError: Error: account non-existent')
+
+        try
+          wallet._getPrivateKey({'i': 1}, 'M/1/1')
+        catch e
+          expect(e.toString()).toEqual('AssertionError: Error: account non-existent')
+
+      it "should not not accept an invalid index", ->
+        try
+          wallet._getPrivateKey(0)
+        catch e
+          expect(e.toString()).toEqual('AssertionError: Error: path must be an string of the form \'M/0/27\'')
+
+        try
+          wallet._getPrivateKey(0, null)
+        catch e
+          expect(e.toString()).toEqual('AssertionError: Error: path must be an string of the form \'M/0/27\'')
+
+        try
+          wallet._getPrivateKey(0, 0)
+        catch e
+          expect(e.toString()).toEqual('AssertionError: Error: path must be an string of the form \'M/0/27\'')
+
+        try
+          wallet._getPrivateKey(0, {'path': 'M/0/1'})
+        catch e
+          expect(e.toString()).toEqual('AssertionError: Error: path must be an string of the form \'M/0/27\'')
+
+      it "should return valid results when no second password is present", ->
+        expect(wallet._getPrivateKey(0, 'M/1/0')).toEqual('KyCEQBmGmTMdZeBhKuY1mnbMkwSYBXgDDMbH3DmS6V1XVNCYS26C')
+        expect(wallet._getPrivateKey(0, 'M/1/2')).toEqual('L3Df8FLaL1ibJc6Vr1dvMpXP69M59aPRaQfA7WWd8ZX85PRVPH8L')
+        expect(wallet._getPrivateKey(0, 'M/1/10')).toEqual('KyEXERjLe7x7NCHNWz5vf9noAUZFCRh9WT2fw3L9GsWQXAoGfbBi')
+        expect(wallet._getPrivateKey(0, 'M/0/0')).toEqual('L1dKvRfAuLf6qCjSavPHKcuHpMfjfpS6t67qeLDwZkWecAB4cXYx')
+        expect(wallet._getPrivateKey(0, 'M/0/2')).toEqual('L4pk2XNmorgkwCJtmE6NHwRowXagDweeybMWaWkfbXqx9dZwAXzV')
+        expect(wallet._getPrivateKey(0, 'M/0/10')).toEqual('KxsdyWBtY8qB5HohiagHGfPyw8jj42Nep61iYgdJ5DpKcgCh51x1')
